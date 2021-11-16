@@ -1,0 +1,7 @@
+<ul>
+  <% @courses.each do |course| %>
+    <li>
+      <a href="/<%= course[:name] %>"><%= course[:name] %></a>
+    </li>
+  <% end %>
+</ul>
