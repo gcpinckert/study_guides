@@ -1,0 +1,9 @@
+<h2><%= params[:course] %></h2>
+
+<ul>
+  <% @topics.each do |topic| %>
+    <li>
+      <a href=<%= "#{params[:course]}/#{topic}" %>><%= topic %><a>
+    </li>
+  <% end %>
+</ul>

@@ -7,7 +7,13 @@
   </head>
   <body>
     <header>
-      <h1>Ginni's Study Guides<h1>
+      <h1>Ginni's Study Guides</h1>
+
+      <% if session[:error] %>
+        <div class="error">
+          <p><%= session.delete(:error) %></p>
+        </div>
+      <% end %>
     </header>
 
     <main>
