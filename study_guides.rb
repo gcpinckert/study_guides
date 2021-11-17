@@ -36,6 +36,42 @@ def render_markdown_as_html(text)
   markdown.render(text)
 end
 
+def search_notes(search_terms)
+  matches = {}
+  pp load_courses_and_topics
+  load_courses_and_topics.each do |course|
+    matches[course[:name]] = {}
+    course[:topics].each do |file|
+      text = File.read(File.join(content_path, course, file))
+      if text.include?(search_terms)
+        matches[course[:name]][file] = matches_from_file(search_terms, text)
+      end
+    end
+  end
+  matches
+end
+
+def matches_from_file(search_terms, text)
+  paragraphs = []
+  text.split("\n\n").each do |paragraph|
+    paragraphs << paragraph if paragraph.include?(search_terms)
+  end
+  paragraphs
+end
+
+def load_topics(course)
+  Dir.children(File.join(content_path, course)).select do |topic|
+    File.extname(topic) == ".md"
+  end
+end
+
+def load_courses_and_topics
+  courses = []
+  Dir.children(content_path).each do |course|
+    courses << { name: course, topics: load_topics(course) }
+  end
+end
+
 # Display all courses
 get "/" do
   @courses = []
@@ -45,6 +81,12 @@ get "/" do
   end
 
   erb :index
+end
+
+# Search the notes and render results
+get "/search" do
+  @matches = search_notes(params[:query]) if params[:query]
+  erb :search
 end
 
 # Display a single course

@@ -1,0 +1,19 @@
+<% if @matches.empty? %>
+  <p>Sorry, no results were found</p>
+<% else %>
+  <ul>
+    <% @matches.each do |course, topics| %>
+      <li><%= course %></li>
+        <ul>
+          <% topics.each do |topic, matches| %>
+            <li><%= topic %></li>
+              <ul>
+                <% matches.each do |match| %>
+                  <p><%= match %>
+                <% end %>
+              </ul>
+          <% end %>
+        </ul>
+    <% end %>
+  </ul>
+<% end %>

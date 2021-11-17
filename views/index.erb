@@ -5,3 +5,8 @@
     </li>
   <% end %>
 </ul>
+
+<form action="/search" method="get">
+  <input name="query" value="<%= params[:query] %>">
+  <button type="submit">Search</button>
+</form>
