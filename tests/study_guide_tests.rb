@@ -22,6 +22,7 @@ class StudyGuidesTest < Minitest::Test
     assert_equal "text/html;charset=utf-8", last_response["Content-Type"]
     assert_includes last_response.body, "rb109"
     assert_includes last_response.body, "ls171"
+    assert_includes last_response.body, '<form action="/search"'
   end
 
   def test_single_course
@@ -47,7 +48,6 @@ class StudyGuidesTest < Minitest::Test
     assert_includes last_response.body, "<h2>Truthiness and Falsiness</h2>"
     assert_includes last_response.body, "<p><code>nil</code> in Ruby is a "
   end
-<<<<<<< HEAD
 
   def test_error_for_nonexistent_topic
     get "/rb109/wrong.md"
@@ -64,6 +64,11 @@ class StudyGuidesTest < Minitest::Test
     assert_equal 302, last_response.status
     assert_equal "not_here.rb does not exist.", session[:error]
   end
-=======
->>>>>>> 2706420a7e7e384fae186d0bf52fabd3e1843c14
+
+  def test_search_with_results
+    get "/search", query: "containers for information"
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "<p><strong>Variables</strong> are basically storage containers for information"
+    assert_includes last_response.body, 'rb109'
+  end
 end

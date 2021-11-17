@@ -9,6 +9,18 @@ configure do
   set :session_secret, 'extra secret'
 end
 
+helpers do
+  def render_markdown_as_html(text)
+    markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML,
+                                        no_intra_emphasis: true,
+                                        tables: true,
+                                        fenced_code_blocks: true,
+                                        autolink: true,
+                                        lax_spacing: true)
+    markdown.render(text)
+  end  
+end
+
 # TODO: Assign content path according to environment
 def content_path
   File.expand_path("../content", __FILE__)
@@ -26,14 +38,47 @@ def error_for_topic(path)
   end
 end
 
-def render_markdown_as_html(text)
-  markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML,
-                                      no_intra_emphasis: true,
-                                      tables: true,
-                                      fenced_code_blocks: true,
-                                      autolink: true,
-                                      lax_spacing: true)
-  markdown.render(text)
+def search_notes(search_terms)
+  matches = {}
+  load_courses_and_topics.each do |course|
+    matches[course[:name]] = {}
+    course[:topics].each do |file|
+      text = File.read(File.join(content_path, course[:name], file))
+      if text.include?(search_terms)
+        matches[course[:name]][file] = matches_from_file(search_terms, text)
+      end
+    end
+  end
+  matches
+end
+
+def matches_from_file(search_terms, text)
+  paragraphs = []
+  text.split("\n\n").each do |paragraph|
+    if paragraph.include?(search_terms) && will_render_well(paragraph)
+      paragraphs << paragraph 
+    end
+  end
+  paragraphs
+end
+
+def will_render_well(text)
+  !text.start_with?("#") &&
+  !text.match?("\n#")
+end
+
+def load_topics(course)
+  Dir.children(File.join(content_path, course)).select do |topic|
+    File.extname(topic) == ".md"
+  end
+end
+
+def load_courses_and_topics
+  courses = []
+  Dir.children(content_path).each do |course|
+    courses << { name: course, topics: load_topics(course) }
+  end
+  courses
 end
 
 # Display all courses
@@ -45,6 +90,12 @@ get "/" do
   end
 
   erb :index
+end
+
+# Search the notes and render results
+get "/search" do
+  @matches = search_notes(params[:query]) if params[:query]
+  erb :search
 end
 
 # Display a single course
