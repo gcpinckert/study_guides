@@ -38,4 +38,13 @@ class StudyGuidesTest < Minitest::Test
     assert_equal 302, last_response.status
     assert_equal "not_a_course does not exist.", session[:error]
   end
+
+  def test_render_single_topic
+    get "/rb109/truthiness.md"
+    assert_equal 200, last_response.status
+    assert_equal "text/html;charset=utf-8", last_response["Content-Type"]
+    assert_includes last_response.body, '<h1>Truthiness</h1>'
+    assert_includes last_response.body, "<h2>Truthiness and Falsiness</h2>"
+    assert_includes last_response.body, "<p><code>nil</code> in Ruby is a "
+  end
 end
