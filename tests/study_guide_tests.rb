@@ -22,6 +22,7 @@ class StudyGuidesTest < Minitest::Test
     assert_equal "text/html;charset=utf-8", last_response["Content-Type"]
     assert_includes last_response.body, "rb109"
     assert_includes last_response.body, "ls171"
+    assert_includes last_response.body, '<form action="/search"'
   end
 
   def test_single_course
@@ -62,5 +63,12 @@ class StudyGuidesTest < Minitest::Test
     get "/rb109/not_here.rb"
     assert_equal 302, last_response.status
     assert_equal "not_here.rb does not exist.", session[:error]
+  end
+
+  def test_search_with_results
+    get "/search", query: "containers for information"
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "<p><strong>Variables</strong> are basically storage containers for information"
+    assert_includes last_response.body, 'rb109'
   end
 end

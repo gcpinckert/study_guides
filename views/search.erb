@@ -3,13 +3,13 @@
 <% else %>
   <ul>
     <% @matches.each do |course, topics| %>
-      <li><%= course %></li>
+      <li><%= course unless course.empty? %></li>
         <ul>
           <% topics.each do |topic, matches| %>
-            <li><%= topic %></li>
+            <li><a href=<%= "/#{course}/#{topic}" %>><%= topic %></a></li>
               <ul>
                 <% matches.each do |match| %>
-                  <p><%= match %>
+                  <p><%= render_markdown_as_html(match) %>
                 <% end %>
               </ul>
           <% end %>
